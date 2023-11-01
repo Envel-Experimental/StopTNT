@@ -1,0 +1,5 @@
+name: StopTNT
+version: '${version}'
+main: by.envel.stoptnt.Main
+api-version: "1.16"
+authors: [ Envel ]
