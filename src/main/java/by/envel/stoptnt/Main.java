@@ -1,7 +1,6 @@
 package by.envel.stoptnt;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -15,8 +14,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionType;
 
 public class Main extends JavaPlugin implements Listener {
 
@@ -58,11 +55,13 @@ public class Main extends JavaPlugin implements Listener {
             return;
         }
 
-        if (item != null && isExplosiveBlock(item.getType())) {
-            event.setCancelled(true);
+        if (item != null) {
+            if (isExplosiveBlock(item.getType())) {
+                event.setCancelled(true);
 
-            if (inventory != null) {
-                inventory.remove(item);
+                if (inventory != null) {
+                    inventory.remove(item);
+                }
             }
         }
     }
@@ -103,19 +102,7 @@ public class Main extends JavaPlugin implements Listener {
         return material == Material.TNT ||
                 material == Material.TNT_MINECART ||
                 material == Material.END_CRYSTAL ||
-                (material == Material.POTION && isPotionInvisibility(material)) ||
                 material == Material.FLINT_AND_STEEL;
     }
-
-    private boolean isPotionInvisibility(Material material) {
-        if (material == Material.POTION) {
-            Potion potion = Potion.fromItemStack(new ItemStack(material));
-            PotionType potionType = potion.getType();
-            return potionType == PotionType.INVISIBILITY || potionType == PotionType.UNCRAFTABLE;
-        }
-        return false;
-    }
-
-
 
 }
