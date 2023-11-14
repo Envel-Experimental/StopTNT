@@ -103,8 +103,9 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryCreative(InventoryCreativeEvent event) {
         ItemStack item = event.getCursor();
+        Player player = (Player) event.getWhoClicked();
 
-        if (item != null && isForbiddenItem(item.getType())) {
+        if (!player.isOp() && item != null && isForbiddenItem(item.getType())) {
             event.setCancelled(true);
             event.setCursor(null);
         }
