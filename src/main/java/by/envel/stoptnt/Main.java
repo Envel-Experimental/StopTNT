@@ -5,10 +5,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -22,7 +25,7 @@ public class Main extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent event) {
         Material blockType = event.getBlockPlaced().getType();
         Player player = event.getPlayer();
@@ -33,10 +36,11 @@ public class Main extends JavaPlugin implements Listener {
 
         if (isExplosiveBlock(blockType)) {
             event.setCancelled(true);
+            removeItemFromInventory(player, blockType);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntitySpawn(EntitySpawnEvent event) {
         EntityType entityType = event.getEntityType();
 
@@ -45,7 +49,7 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         ItemStack item = event.getCurrentItem();
@@ -55,18 +59,17 @@ public class Main extends JavaPlugin implements Listener {
             return;
         }
 
-        if (item != null) {
-            if (isForbiddenItem(item.getType())) {
-                event.setCancelled(true);
+        if (item != null && isForbiddenItem(item.getType())) {
+            event.setCancelled(true);
 
-                if (inventory != null) {
-                    inventory.remove(item);
-                }
+            if (inventory != null) {
+                inventory.remove(item);
+                player.updateInventory();
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
@@ -77,12 +80,12 @@ public class Main extends JavaPlugin implements Listener {
 
         if (isForbiddenItem(item.getType())) {
             event.setCancelled(true);
-
             player.getInventory().remove(item);
+            player.updateInventory();
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItemDrop().getItemStack();
@@ -93,15 +96,28 @@ public class Main extends JavaPlugin implements Listener {
 
         if (isForbiddenItem(item.getType())) {
             event.setCancelled(true);
-
             event.getItemDrop().remove();
         }
     }
 
-    private boolean isExplosiveBlock(Material material) {
-        return material == Material.TNT ||
-                material == Material.TNT_MINECART ||
-                material == Material.FLINT_AND_STEEL;
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onInventoryCreative(InventoryCreativeEvent event) {
+        ItemStack item = event.getCursor();
+
+        if (item != null && isForbiddenItem(item.getType())) {
+            event.setCancelled(true);
+            event.setCursor(null);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockDispense(BlockDispenseEvent event) {
+        ItemStack item = event.getItem();
+
+        if (item != null && isForbiddenItem(item.getType())) {
+            event.setCancelled(true);
+            event.setItem(new ItemStack(Material.AIR));
+        }
     }
 
     private boolean isForbiddenItem(Material material) {
@@ -109,7 +125,15 @@ public class Main extends JavaPlugin implements Listener {
                 material == Material.ENDER_EYE ||
                 material == Material.DRAGON_EGG ||
                 isPotionType(material) ||
-                isSpawnEgg(material);
+                isSpawnEgg(material) ||
+                isExplosiveBlock(material);
+    }
+
+    private boolean isExplosiveBlock(Material material) {
+        return material == Material.TNT ||
+                material == Material.TNT_MINECART ||
+                material == Material.FLINT_AND_STEEL ||
+                material == Material.END_CRYSTAL;
     }
 
     private boolean isPotionType(Material material) {
@@ -120,5 +144,19 @@ public class Main extends JavaPlugin implements Listener {
 
     private boolean isSpawnEgg(Material material) {
         return material.name().endsWith("SPAWN_EGG");
+    }
+
+    private void removeItemFromInventory(Player player, Material material) {
+        ItemStack[] contents = player.getInventory().getContents();
+
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack item = contents[i];
+            if (item != null && item.getType() == material) {
+                contents[i] = null;
+            }
+        }
+
+        player.getInventory().setContents(contents);
+        player.updateInventory();
     }
 }
