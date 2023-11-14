@@ -56,7 +56,7 @@ public class Main extends JavaPlugin implements Listener {
         }
 
         if (item != null) {
-            if (isExplosiveBlock(item.getType())) {
+            if (isForbiddenItem(item.getType())) {
                 event.setCancelled(true);
 
                 if (inventory != null) {
@@ -75,7 +75,7 @@ public class Main extends JavaPlugin implements Listener {
             return;
         }
 
-        if (isExplosiveBlock(item.getType())) {
+        if (isForbiddenItem(item.getType())) {
             event.setCancelled(true);
 
             player.getInventory().remove(item);
@@ -91,7 +91,7 @@ public class Main extends JavaPlugin implements Listener {
             return;
         }
 
-        if (isExplosiveBlock(item.getType())) {
+        if (isForbiddenItem(item.getType())) {
             event.setCancelled(true);
 
             event.getItemDrop().remove();
@@ -101,8 +101,20 @@ public class Main extends JavaPlugin implements Listener {
     private boolean isExplosiveBlock(Material material) {
         return material == Material.TNT ||
                 material == Material.TNT_MINECART ||
-                material == Material.END_CRYSTAL ||
                 material == Material.FLINT_AND_STEEL;
     }
 
+    private boolean isForbiddenItem(Material material) {
+        return material == Material.ENDER_PEARL ||
+                material == Material.ENDER_EYE ||
+                material == Material.SPAWNER ||
+                material == Material.DRAGON_EGG ||
+                isPotionType(material);
+    }
+
+    private boolean isPotionType(Material material) {
+        return material == Material.POTION ||
+                material == Material.SPLASH_POTION ||
+                material == Material.LINGERING_POTION;
+    }
 }
