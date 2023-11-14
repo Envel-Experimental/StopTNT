@@ -34,7 +34,7 @@ processResources {
 }
 
 shadowJar {
-    archiveFileName = 'StopTNT-' + project.version.toString() + '.jar';
+    archiveFileName = 'StopTNT-RESTRICTED-' + project.version.toString() + '.jar';
 }
 
 artifacts {

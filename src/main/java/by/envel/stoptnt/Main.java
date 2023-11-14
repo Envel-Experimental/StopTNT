@@ -107,14 +107,18 @@ public class Main extends JavaPlugin implements Listener {
     private boolean isForbiddenItem(Material material) {
         return material == Material.ENDER_PEARL ||
                 material == Material.ENDER_EYE ||
-                material == Material.SPAWNER ||
                 material == Material.DRAGON_EGG ||
-                isPotionType(material);
+                isPotionType(material) ||
+                isSpawnEgg(material);
     }
 
     private boolean isPotionType(Material material) {
         return material == Material.POTION ||
                 material == Material.SPLASH_POTION ||
                 material == Material.LINGERING_POTION;
+    }
+
+    private boolean isSpawnEgg(Material material) {
+        return material.name().endsWith("SPAWN_EGG");
     }
 }
