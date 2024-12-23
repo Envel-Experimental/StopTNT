@@ -123,7 +123,8 @@ public class Main extends JavaPlugin implements Listener {
 
     private boolean isForbiddenItem(Material material) {
         return material == Material.ENDER_PEARL ||
-                material == Material.ENDER_EYE ||
+                material == Material.CHORUS_FRUIT ||
+                material == Material.EGG ||
                 material == Material.DRAGON_EGG ||
                 isPotionType(material) ||
                 isSpawnEgg(material) ||
@@ -132,6 +133,7 @@ public class Main extends JavaPlugin implements Listener {
 
     private boolean isExplosiveBlock(Material material) {
         return material == Material.TNT ||
+                material == Material.RESPAWN_ANCHOR ||
                 material == Material.TNT_MINECART ||
                 material == Material.FLINT_AND_STEEL ||
                 material == Material.END_CRYSTAL;
