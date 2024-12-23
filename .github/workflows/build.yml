@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - master
+      - restricted
   workflow_dispatch:
 
 permissions:
@@ -22,6 +22,18 @@ jobs:
         with:
           java-version: '8'
           distribution: 'temurin'
+
+      - name: Install Gradle
+        run: |
+          wget https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          unzip gradle-8.2-bin.zip
+          sudo mv gradle-8.2 /opt/gradle
+          echo 'export PATH=$PATH:/opt/gradle/bin' >> ~/.bashrc
+          source ~/.bashrc
+
+      - name: Create Gradle Wrapper
+        run: |
+          gradle wrapper || true  # Игнорируем ошибку, если gradlew уже существует
 
       - name: Make gradlew executable
         run: chmod +x gradlew
