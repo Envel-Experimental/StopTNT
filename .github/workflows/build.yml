@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - restricted
+      - master
   workflow_dispatch:
 
 permissions:
@@ -22,6 +22,9 @@ jobs:
         with:
           java-version: '8'
           distribution: 'temurin'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
       - name: Build with Gradle
         run: ./gradlew build
